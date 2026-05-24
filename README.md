@@ -1,36 +1,85 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# INK / STUDIO — Tattoo Salon Website
 
-## Getting Started
+Production-ready сайт тату-студии на Next.js 15, PostgreSQL, Prisma, NextAuth.
 
-First, run the development server:
+## Стек
+
+- Next.js 15 (App Router), TypeScript, Tailwind CSS 4
+- PostgreSQL + Prisma ORM
+- NextAuth (credentials), Zustand-ready architecture
+- React Hook Form + Zod, Framer Motion, UploadThing
+- Docker + docker-compose
+
+## Быстрый старт
+
+**Сначала запустите Docker Desktop** (иконка кита в меню macOS → «Docker is running»).
 
 ```bash
+cp .env.example .env   # если ещё нет .env
+npm install
+npm run db:up          # PostgreSQL + схема + seed (одной командой)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Или вручную:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+docker compose up -d db
+npx prisma db push
+npm run db:seed
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Ошибка `Can't reach database server at localhost:5432`
 
-## Learn More
+PostgreSQL не запущен. Решение:
 
-To learn more about Next.js, take a look at the following resources:
+1. Откройте **Docker Desktop** и дождитесь запуска демона.
+2. Выполните `npm run db:up` (или `docker compose up -d db`).
+3. Повторите `npx prisma db push` и `npm run db:seed`, если нужно отдельно.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Сайт: http://localhost:3000
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Учётные записи после seed
 
-## Deploy on Vercel
+| Роль | Email | Пароль |
+|------|-------|--------|
+| Admin | admin@inkstudio.ru | admin123 |
+| Manager | manager@inkstudio.ru | manager123 |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Production
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+docker compose up --build
+```
+
+Приложение: http://localhost:3000  
+PostgreSQL: localhost:5433 (порт 5433, чтобы не конфликтовать с другими проектами на 5432)
+
+## Для новичков
+
+Подробный путеводитель по папкам, страницам и сценариям (отзывы, запись, картинки): **[PROJECT_GUIDE.md](./PROJECT_GUIDE.md)**.
+
+## Структура
+
+- `src/app/(site)` — публичные страницы
+- `src/app/admin` — админ-панель (ADMIN / MANAGER)
+- `src/actions` — Server Actions
+- `src/services` — бизнес-логика
+- `src/widgets`, `src/features` — UI по FSD
+- `prisma` — схема БД и seed
+
+## Переменные окружения
+
+См. `.env.example` — UploadThing, Resend, Telegram, GA.
+
+## Страницы
+
+- `/` — главная
+- `/eskizy` — каталог
+- `/zapis` — запись
+- `/o-nas` — о студии
+- `/galereya`, `/kontakty`, `/blog`
+- `/master/[slug]` — мастер
+- `/vhod`, `/registraciya`, `/kabinet`
+- `/admin` — CMS
